@@ -89,14 +89,11 @@ const MealBreakCalculations = {
       workIntervals.push([currentIntervalStart, currentIntervalEnd, currentIntervalDuration]);
     }
 
-    console.log('Work Intervals:');
     workIntervals.forEach(interval => {
       const [start, end, durationTotalSeconds] = interval;
       const hours = Math.floor(durationTotalSeconds / 3600);
       const minutes = Math.floor((durationTotalSeconds % 3600) / 60);
       const seconds = durationTotalSeconds % 60;
-
-      console.log(`Start: ${start[0]}:${start[1]}:${start[2]}, End: ${end[0]}:${end[1]}:${end[2]}, Duration: ${hours}h ${minutes}m ${seconds}s`);
     });
 
     return workIntervals;
@@ -108,7 +105,6 @@ const MealBreakCalculations = {
     const minutes = Math.floor((totalDurationSeconds % 3600) / 60);
     const seconds = totalDurationSeconds % 60;
 
-    console.log(`Total Workday Duration: ${hours}h ${minutes}m ${seconds}s`);
     return [hours, minutes, seconds];
   },
 
@@ -122,12 +118,9 @@ const MealBreakCalculations = {
       }
   
       if (interval[2] >= 1800) { // Check if the break was 30 minutes or more
-        console.log('Compliant: A 30 minute break was taken in the first 5 hours of combined working hours.');
         return true;
       }
     }
-  
-    console.log('Non-compliant: No 30 minute break was taken in the first 5 hours of combined working hours.');
     return false;
   },
   
@@ -177,6 +170,7 @@ const MealBreakCalculations = {
     }
   },
 
+  //Takes the UI data, maps it to a nested array, validates it, returns the compliance status of both meal breaks
   runMealBreakCalculations(timeBlocks) {
     const bundledData = this.bundleTimeBlocks(timeBlocks);
   
@@ -192,22 +186,28 @@ const MealBreakCalculations = {
     const workIntervals = this.calculateWorkIntervals(orderedTimeblocks);
     const totalWorkdayDuration = this.returnTotalWorkdayDuration(workIntervals);
     const totalWorkdayDurationSeconds = totalWorkdayDuration[0] * 3600 + totalWorkdayDuration[1] * 60 + totalWorkdayDuration[2];
-
-    //If workday is less than 6 hours the day is always compliant. 
-    if (totalWorkdayDurationSeconds < 21600) { //Less than 6 hours
-      return [true, true];
+  
+    let firstBreakCompliant = true;
+    let secondBreakCompliant = true;
+  
+    if (totalWorkdayDurationSeconds < 21600) { // Less than 6 hours
+      firstBreakCompliant = true;
+      secondBreakCompliant = true;
+    } else if (totalWorkdayDurationSeconds >= 21600 && totalWorkdayDurationSeconds < 36000) { // More than 6 hours but less than 10 hours
+      firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
+      secondBreakCompliant = true;
+    } else {
+      // Additional checks can be added here for workdays longer than 10 hours if needed
+      firstBreakCompliant = false;
+      secondBreakCompliant = false;
     }
-
-    //If workday is more than 6 hours and less than 10 hours
-    if (totalWorkdayDurationSeconds >= 21600 && totalWorkdayDurationSeconds < 36000) { // More than 6 hours but less than 10 hours
-      const firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
-      return [firstBreakCompliant, true];
-    }
-
-
-    return [false, false]
-   
+  
+    console.log(`First break compliant: ${firstBreakCompliant}`);
+    console.log(`Second break compliant: ${secondBreakCompliant}`);
+  
+    return [firstBreakCompliant, secondBreakCompliant];
   }
+  
 };
 
 export default MealBreakCalculations;
