@@ -1,5 +1,3 @@
-// mealBreakCalculations.js
-
 const MealBreakCalculations = {
   bundleTimeBlocks(timeBlocks) {
     return timeBlocks.map(block => [
@@ -61,6 +59,7 @@ const MealBreakCalculations = {
     const workIntervals = [];
     let currentIntervalStart = null;
     let currentIntervalEnd = null;
+    let currentIntervalDuration = 0;
 
     for (let i = 0; i < orderedTimeblocks.length; i++) {
       const [start, end] = orderedTimeblocks[i];
@@ -70,29 +69,29 @@ const MealBreakCalculations = {
       if (!currentIntervalStart) {
         currentIntervalStart = start;
         currentIntervalEnd = end;
+        currentIntervalDuration = endTotalSeconds - startTotalSeconds;
       } else {
         const lastEndTotalSeconds = currentIntervalEnd[0] * 3600 + currentIntervalEnd[1] * 60 + currentIntervalEnd[2];
         const breakDuration = startTotalSeconds - lastEndTotalSeconds;
 
         if (breakDuration >= 1800) { // 30 minutes or more break
-          workIntervals.push([currentIntervalStart, currentIntervalEnd]);
+          workIntervals.push([currentIntervalStart, currentIntervalEnd, currentIntervalDuration]);
           currentIntervalStart = start;
+          currentIntervalDuration = endTotalSeconds - startTotalSeconds;
+        } else {
+          currentIntervalDuration += endTotalSeconds - startTotalSeconds;
         }
         currentIntervalEnd = end;
       }
     }
 
     if (currentIntervalStart) {
-      workIntervals.push([currentIntervalStart, currentIntervalEnd]);
+      workIntervals.push([currentIntervalStart, currentIntervalEnd, currentIntervalDuration]);
     }
 
     console.log('Work Intervals:');
     workIntervals.forEach(interval => {
-      const [start, end] = interval;
-      const startTotalSeconds = start[0] * 3600 + start[1] * 60 + start[2];
-      const endTotalSeconds = end[0] * 3600 + end[1] * 60 + end[2];
-      const durationTotalSeconds = endTotalSeconds - startTotalSeconds;
-
+      const [start, end, durationTotalSeconds] = interval;
       const hours = Math.floor(durationTotalSeconds / 3600);
       const minutes = Math.floor((durationTotalSeconds % 3600) / 60);
       const seconds = durationTotalSeconds % 60;
