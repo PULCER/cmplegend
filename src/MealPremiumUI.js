@@ -4,6 +4,7 @@ import MealBreakCalculations from './mealBreakCalculations'; // Import the MealB
 
 function MealPremiumUI() {
   const [timeBlocks, setTimeBlocks] = useState([{ clockIn: { hour: '00', minute: '00', second: '00' }, clockOut: { hour: '00', minute: '00', second: '00' } }]);
+  const [complianceResults, setComplianceResults] = useState({ firstBreak: null, secondBreak: null, error: null });
 
   const handleAddTimeBlock = () => {
     setTimeBlocks([...timeBlocks, { clockIn: { hour: '00', minute: '00', second: '00' }, clockOut: { hour: '00', minute: '00', second: '00' } }]);
@@ -23,11 +24,25 @@ function MealPremiumUI() {
 
   const handleClearAll = () => {
     setTimeBlocks([{ clockIn: { hour: '00', minute: '00', second: '00' }, clockOut: { hour: '00', minute: '00', second: '00' } }]);
+    setComplianceResults({ firstBreak: null, secondBreak: null, error: null }); // Clear compliance results and error
   };
 
   const handleCalculate = () => {
-    const bundledData = MealBreakCalculations.runMealBreakCalculations(timeBlocks);
-    // Further processing logic can be added here
+    const result = MealBreakCalculations.runMealBreakCalculations(timeBlocks);
+    if (result) {
+      const [firstBreakCompliant, secondBreakCompliant] = result;
+      setComplianceResults({
+        firstBreak: firstBreakCompliant ? "Compliant" : "Non-Compliant",
+        secondBreak: secondBreakCompliant ? "Compliant" : "Non-Compliant",
+        error: null
+      });
+    } else {
+      setComplianceResults({
+        firstBreak: null,
+        secondBreak: null,
+        error: "Check your inputs"
+      });
+    }
   };
 
   const generateOptions = (limit) => {
@@ -75,6 +90,19 @@ function MealPremiumUI() {
       <button className="add-button" onClick={handleAddTimeBlock}>Add Time Block</button>
       <button className="clear-button" onClick={handleClearAll}>Clear All</button>
       <button className="calculate-button" onClick={handleCalculate}>Calculate</button>
+
+      {complianceResults.error && (
+        <div className="error-message">
+          <p>{complianceResults.error}</p>
+        </div>
+      )}
+
+      {complianceResults.firstBreak !== null && complianceResults.secondBreak !== null && (
+        <div className="compliance-results">
+          <p>First Break: {complianceResults.firstBreak}</p>
+          <p>Second Break: {complianceResults.secondBreak}</p>
+        </div>
+      )}
     </div>
   );
 }
