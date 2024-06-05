@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './MealPremiumUI.css';
-import { bundleTimeBlocks } from './mealBreakCalculations'; // Import the bundleTimeBlocks function
+import MealBreakCalculations from './mealBreakCalculations'; // Import the MealBreakCalculations object
 
 function MealPremiumUI() {
   const [timeBlocks, setTimeBlocks] = useState([{ clockIn: { hour: '00', minute: '00', second: '00' }, clockOut: { hour: '00', minute: '00', second: '00' } }]);
@@ -26,9 +26,9 @@ function MealPremiumUI() {
   };
 
   const handleCalculate = () => {
-    const bundledData = bundleTimeBlocks(timeBlocks);
+    const bundledData = MealBreakCalculations.runMealBreakCalculations(timeBlocks);
     console.log('Bundled Data:', bundledData);
-    // Further processing logic will go here
+    // Further processing logic can be added here
   };
 
   const generateOptions = (limit) => {
