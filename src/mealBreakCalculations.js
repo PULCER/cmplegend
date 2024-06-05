@@ -137,8 +137,6 @@ const MealBreakCalculations = {
         }
       }
     }
-  
-    console.log('Non-compliant: No 30 minute break was taken between 5 and 10 hours of total working hours.');
     return false;
   },
 
