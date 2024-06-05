@@ -175,9 +175,9 @@ const MealBreakCalculations = {
         secondBreakCompliant = this.secondBreakWasCompliant(workIntervals);
       } else if (totalWorkdayDurationSeconds >= 36000 && totalWorkdayDurationSeconds < 43200 && firstBreakCompliant) { // More than 10 hours and less than 12 hours and first break was compliant
         secondBreakCompliant = true;
-      } else {
-        firstBreakCompliant = false;
-        secondBreakCompliant = false;
+      } else if (totalWorkdayDurationSeconds >= 43200){
+        firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
+        secondBreakCompliant = this.secondBreakWasCompliant(workIntervals);
       }
     }
   
