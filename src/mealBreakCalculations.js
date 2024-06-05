@@ -126,48 +126,20 @@ const MealBreakCalculations = {
   
 
   secondBreakWasCompliant(workIntervals) {
-    const totalDuration = this.returnTotalWorkdayDuration(workIntervals);
-    const totalDurationSeconds = totalDuration[0] * 3600 + totalDuration[1] * 60 + totalDuration[2];
-  
-    if (totalDurationSeconds <= 43200) { // 12 hours
-      console.log('Total workday duration is 12 hours or less. No second meal break required.');
-      return true;
-    }
-  
     let accumulatedTime = 0;
-    let foundBreak = false;
-    let firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
   
-    if (!firstBreakCompliant) {
-      for (const interval of workIntervals) {
-        accumulatedTime += interval[2];
-        if (accumulatedTime > 18000 && accumulatedTime <= 36000) { // Between 5 and 10 hours
-          const breakDuration = interval[2];
-          if (breakDuration >= 1800) { // 30 minutes or more break
-            foundBreak = true;
-            break;
-          }
+    for (const interval of workIntervals) {
+      accumulatedTime += interval[2];
+      if (accumulatedTime > 18000 && accumulatedTime <= 36000) { // Between 5 and 10 hours
+        if (interval[2] >= 1800) { // 30 minutes or more break
+          console.log('Compliant: A 30 minute break was taken between 5 and 10 hours of total working hours.');
+          return true;
         }
       }
-  
-      if (foundBreak) {
-        console.log('Compliant: A 30 minute break was taken between 5 and 10 hours of total working hours.');
-      } else {
-        console.log('Non-compliant: No 30 minute break was taken between 5 and 10 hours of total working hours.');
-      }
-  
-      return foundBreak;
-    } else {
-
-  
-      if (foundBreak) {
-        console.log('Compliant: A 30 minute break was taken between 6 and 12 hours of total working hours.');
-      } else {
-        console.log('Non-compliant: No 30 minute break was taken between 6 and 12 hours of total working hours.');
-      }
-  
-      return foundBreak;
     }
+  
+    console.log('Non-compliant: No 30 minute break was taken between 5 and 10 hours of total working hours.');
+    return false;
   },
 
   //Takes the UI data, maps it to a nested array, validates it, returns the compliance status of both meal breaks
@@ -196,8 +168,10 @@ const MealBreakCalculations = {
     } else if (totalWorkdayDurationSeconds >= 21600 && totalWorkdayDurationSeconds < 36000) { // More than 6 hours but less than 10 hours
       firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
       secondBreakCompliant = true;
+    } else if (totalWorkdayDurationSeconds >= 36000 && !firstBreakCompliant) { // More than 10 hours and first break wasn't compliant
+      firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
+      secondBreakCompliant = this.secondBreakWasCompliant(workIntervals);
     } else {
-      // Additional checks can be added here for workdays longer than 10 hours if needed
       firstBreakCompliant = false;
       secondBreakCompliant = false;
     }
