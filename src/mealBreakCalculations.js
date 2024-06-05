@@ -55,6 +55,7 @@ const MealBreakCalculations = {
     return orderedTimeblocks;
   },
 
+  //This essentially merges the timeblocks that have a break less than 30 minutes in between them, and then breaks appart new intervals when over a 30 minute break is detected
   calculateWorkIntervals(orderedTimeblocks) {
     const workIntervals = [];
     let currentIntervalStart = null;
@@ -100,6 +101,7 @@ const MealBreakCalculations = {
     return workIntervals;
   },
 
+  //Calculates the total workday duration
   returnTotalWorkdayDuration(workIntervals) {
     const totalDurationSeconds = workIntervals.reduce((acc, interval) => acc + interval[2], 0);
     const hours = Math.floor(totalDurationSeconds / 3600);
@@ -109,6 +111,7 @@ const MealBreakCalculations = {
     return [hours, minutes, seconds];
   },
 
+  //Checks if the first break was compliant
   firstBreakWasCompliant(workIntervals) {
     let accumulatedTime = 0;
   
@@ -125,7 +128,7 @@ const MealBreakCalculations = {
     return false;
   },
   
-
+//Checks if the second break was compliant
   secondBreakWasCompliant(workIntervals) {
     let accumulatedTime = 0;
   
