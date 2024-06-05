@@ -27,7 +27,6 @@ function MealPremiumUI() {
 
   const handleCalculate = () => {
     const bundledData = MealBreakCalculations.runMealBreakCalculations(timeBlocks);
-    console.log('Bundled Data:', bundledData);
     // Further processing logic can be added here
   };
 
