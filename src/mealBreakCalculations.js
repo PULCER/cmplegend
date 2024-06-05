@@ -94,6 +94,7 @@ const MealBreakCalculations = {
       const hours = Math.floor(durationTotalSeconds / 3600);
       const minutes = Math.floor((durationTotalSeconds % 3600) / 60);
       const seconds = durationTotalSeconds % 60;
+      console.log(`Start: ${start[0]}:${start[1]}:${start[2]}, End: ${end[0]}:${end[1]}:${end[2]}, Duration: ${hours}h ${minutes}m ${seconds}s`);
     });
 
     return workIntervals;
@@ -165,15 +166,19 @@ const MealBreakCalculations = {
     if (totalWorkdayDurationSeconds < 21600) { // Less than 6 hours
       firstBreakCompliant = true;
       secondBreakCompliant = true;
-    } else if (totalWorkdayDurationSeconds >= 21600 && totalWorkdayDurationSeconds < 36000) { // More than 6 hours but less than 10 hours
-      firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
-      secondBreakCompliant = true;
-    } else if (totalWorkdayDurationSeconds >= 36000 && !firstBreakCompliant) { // More than 10 hours and first break wasn't compliant
-      firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
-      secondBreakCompliant = this.secondBreakWasCompliant(workIntervals);
     } else {
-      firstBreakCompliant = false;
-      secondBreakCompliant = false;
+      firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
+  
+      if (totalWorkdayDurationSeconds >= 21600 && totalWorkdayDurationSeconds < 36000) { // More than 6 hours but less than 10 hours
+        secondBreakCompliant = true;
+      } else if (totalWorkdayDurationSeconds >= 36000 && !firstBreakCompliant) { // More than 10 hours and first break wasn't compliant
+        secondBreakCompliant = this.secondBreakWasCompliant(workIntervals);
+      } else if (totalWorkdayDurationSeconds >= 36000 && totalWorkdayDurationSeconds < 43200 && firstBreakCompliant) { // More than 10 hours and less than 12 hours and first break was compliant
+        secondBreakCompliant = true;
+      } else {
+        firstBreakCompliant = false;
+        secondBreakCompliant = false;
+      }
     }
   
     console.log(`First break compliant: ${firstBreakCompliant}`);
