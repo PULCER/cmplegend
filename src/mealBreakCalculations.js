@@ -129,7 +129,7 @@ const MealBreakCalculations = {
   
     console.log('Non-compliant: No 30 minute break was taken in the first 5 hours of combined working hours.');
     return false;
-  }
+  },
   
 
   secondBreakWasCompliant(workIntervals) {
