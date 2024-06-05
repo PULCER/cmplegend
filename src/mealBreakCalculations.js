@@ -112,7 +112,7 @@ const MealBreakCalculations = {
     return [hours, minutes, seconds];
   },
 
-  assessFirstMealPremium(workIntervals) {
+  firstBreakWasCompliant(workIntervals) {
     const totalDuration = this.returnTotalWorkdayDuration(workIntervals);
     const totalDurationSeconds = totalDuration[0] * 3600 + totalDuration[1] * 60 + totalDuration[2];
 
@@ -152,7 +152,7 @@ const MealBreakCalculations = {
     return foundBreak;
   },
 
-  assessSecondMealPremium(workIntervals) {
+  secondBreakWasCompliant(workIntervals) {
     const totalDuration = this.returnTotalWorkdayDuration(workIntervals);
     const totalDurationSeconds = totalDuration[0] * 3600 + totalDuration[1] * 60 + totalDuration[2];
   
@@ -163,7 +163,7 @@ const MealBreakCalculations = {
   
     let accumulatedTime = 0;
     let foundBreak = false;
-    let firstBreakCompliant = this.assessFirstMealPremium(workIntervals);
+    let firstBreakCompliant = this.firstBreakWasCompliant(workIntervals);
   
     if (!firstBreakCompliant) {
       for (const interval of workIntervals) {
@@ -185,16 +185,7 @@ const MealBreakCalculations = {
   
       return foundBreak;
     } else {
-      for (const interval of workIntervals) {
-        accumulatedTime += interval[2];
-        if (accumulatedTime > 21600 && accumulatedTime <= 43200) { // Between 6 and 12 hours
-          const breakDuration = interval[2];
-          if (breakDuration >= 1800) { // 30 minutes or more break
-            foundBreak = true;
-            break;
-          }
-        }
-      }
+
   
       if (foundBreak) {
         console.log('Compliant: A 30 minute break was taken between 6 and 12 hours of total working hours.');
@@ -220,11 +211,11 @@ const MealBreakCalculations = {
   
     const orderedTimeblocks = this.returnOrderedTimeblocks(bundledData);
     const workIntervals = this.calculateWorkIntervals(orderedTimeblocks);
-    const firstMealCompliant = this.assessFirstMealPremium(workIntervals);
+    const firstMealCompliant = this.firstBreakWasCompliant(workIntervals);
   
     if (!firstMealCompliant) {
       console.log('Non-compliant: No 30 minute break was taken in the first total 5 hours of combined working hours.');
-      this.assessSecondMealPremium(workIntervals); // Assess the second meal premium if the first one is non-compliant
+      this.secondBreakWasCompliant(workIntervals); // Assess the second meal premium if the first one is non-compliant
       return;
     }
   
@@ -232,7 +223,7 @@ const MealBreakCalculations = {
     const totalDurationSeconds = totalDuration[0] * 3600 + totalDuration[1] * 60 + totalDuration[2];
   
     if (totalDurationSeconds > 43200) { // If the total duration is more than 12 hours
-      this.assessSecondMealPremium(workIntervals);
+      this.secondBreakWasCompliant(workIntervals);
     } else {
       console.log('Total workday duration is 12 hours or less. No second meal break required.');
       console.log('Compliant: No second meal break needed for total workday duration under 12 hours.');
