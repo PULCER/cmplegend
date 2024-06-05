@@ -133,7 +133,6 @@ const MealBreakCalculations = {
       accumulatedTime += interval[2];
       if (accumulatedTime > 18000 && accumulatedTime <= 36000) { // Between 5 and 10 hours
         if (interval[2] >= 1800) { // 30 minutes or more break
-          console.log('Compliant: A 30 minute break was taken between 5 and 10 hours of total working hours.');
           return true;
         }
       }
