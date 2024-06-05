@@ -102,6 +102,46 @@ const MealBreakCalculations = {
     return workIntervals;
   },
 
+  printTotalWorkdayDuration(workIntervals) {
+    const totalDurationSeconds = workIntervals.reduce((acc, interval) => acc + interval[2], 0);
+    const hours = Math.floor(totalDurationSeconds / 3600);
+    const minutes = Math.floor((totalDurationSeconds % 3600) / 60);
+    const seconds = totalDurationSeconds % 60;
+
+    console.log(`Total Workday Duration: ${hours}h ${minutes}m ${seconds}s`);
+  },
+
+  assessMealPremium(workIntervals) {
+    const firstInterval = workIntervals[0];
+    const firstIntervalDuration = firstInterval[2];
+
+    if (firstIntervalDuration <= 21600) { // 6 hours
+      console.log('Total workday duration is 6 hours or less. No meal break required.');
+      return true;
+    }
+
+    let firstFiveHoursCompliant = false;
+    let accumulatedTime = 0;
+
+    for (const interval of workIntervals) {
+      accumulatedTime += interval[2];
+      if (accumulatedTime >= 18000) { // 5 hours
+        if (accumulatedTime - interval[2] < 18000) { // If the break happened within the first 5 hours
+          firstFiveHoursCompliant = true;
+        }
+        break;
+      }
+    }
+
+    if (firstFiveHoursCompliant) {
+      console.log('Compliant: A 30 minute break was taken in the first total 5 hours of combined working hours.');
+    } else {
+      console.log('Non-compliant: No 30 minute break was taken in the first total 5 hours of combined working hours.');
+    }
+
+    return firstFiveHoursCompliant;
+  },
+
   runMealBreakCalculations(timeBlocks) {
     const bundledData = this.bundleTimeBlocks(timeBlocks);
     console.log('Bundled Data:', bundledData);
@@ -115,8 +155,9 @@ const MealBreakCalculations = {
     }
 
     const orderedTimeblocks = this.returnOrderedTimeblocks(bundledData);
-    this.calculateWorkIntervals(orderedTimeblocks);
-    // Further processing logic will go here
+    const workIntervals = this.calculateWorkIntervals(orderedTimeblocks);
+    this.printTotalWorkdayDuration(workIntervals);
+    this.assessMealPremium(workIntervals);
     return bundledData;
   }
 };
